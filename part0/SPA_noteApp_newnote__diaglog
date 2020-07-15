@@ -1,0 +1,4 @@
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa payload:{content: "十里山路不换肩", date: "2020-07-15T15:28:31.414Z"} 
+ 
+server-->browser: json: {"message":"note created"}
