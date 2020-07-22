@@ -2,7 +2,9 @@ import React  from 'react'
 import axios from 'axios'
 import personsServices from '../services/persons' 
 
-const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,setShowPersons }) => {
+
+
+const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,setShowPersons, setNotiMessage }) => {
     const addPerson = (event) => {
         event.preventDefault()
         
@@ -19,6 +21,26 @@ const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,
             ()=>{
               setPersons(persons.map((p)=>p.name===newPerson.name?{...p, number:newPerson.number}:p))
               setShowPersons(showPersons.map((p)=>p.name===newPerson.name?{...p, number:newPerson.number}:p))
+              
+              setNotiMessage(`update ${newPerson.name}'s Number.`)
+              setTimeout(() => {
+                console.log()
+                setNotiMessage(null)
+              }, 5000);
+
+              setNewPerson({})
+            }
+          )
+          .catch(
+            (error) => {
+              setNotiMessage(` ${newPerson.name} doesn't exist on server.`)
+              setTimeout(() => {
+                console.log()
+                setNotiMessage(null)
+              }, 5000);
+
+              setPersons(persons.filter((p)=>p.name!=newPerson.name))
+              setShowPersons(showPersons.filter((p)=>p.name!=newPerson.name))
               setNewPerson({})
             }
           )
@@ -32,6 +54,13 @@ const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,
           (response)=> {
             setPersons(persons.concat(response.data))
             setShowPersons(persons.concat(response.data))
+
+            setNotiMessage(`Added ${newPerson.name}.`)
+            setTimeout(() => {
+              console.log()
+              setNotiMessage(null)
+            }, 5000);
+
             setNewPerson({})
           }
         )

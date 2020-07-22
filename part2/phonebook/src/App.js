@@ -4,6 +4,7 @@ import PersonsForm from './components/PersonsForm'
 import Filter from './components/Filter'
 import axios from 'axios'
 import personsServices from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -14,6 +15,7 @@ const App = () => {
 
   const [ newPerson, setNewPerson ] = useState({})
   const [ filterWord, setfilterWord ] = useState('')
+  const [ notiMessage, setNotiMessage] = useState(null)
 
 
   useEffect(()=>{
@@ -35,6 +37,10 @@ const App = () => {
       persons={persons}
       />
 
+      <Notification 
+      message={notiMessage}
+      />
+
       <h1>Add New One</h1>
       <PersonsForm 
         persons={persons}
@@ -43,6 +49,7 @@ const App = () => {
         setShowPersons={setShowPersons}
         newPerson={newPerson}
         setNewPerson={setNewPerson}
+        setNotiMessage={setNotiMessage}
       />
 
       <h2>Numbers</h2>
