@@ -2,6 +2,17 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
+let morgan = require('morgan')
+
+morgan.token('postData', function (req, res) {
+    if(req.method === 'POST'){
+        return JSON.stringify(req.body) 
+    }else {
+        return ""
+    }     
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'))
+
 let persons = [
       {
         "name": "Ada Lovelace",
@@ -38,7 +49,7 @@ const generateNewId = () => {
 
 app.get('/api/persons', (req, res) => {
     
-    console.log("get persons")
+    // console.log("get persons")
     res.json(persons)
 })
 
