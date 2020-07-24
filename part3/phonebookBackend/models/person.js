@@ -10,21 +10,41 @@ const mongoose = require('mongoose')
 
 
 
-const password = process.argv[2]
+
 
 const url = process.env.MONGODB_URI
 
 mongoose.connect(url,  { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(result => console.log('connected to mongoDB'))
+    .then(() => console.log('connected to mongoDB'))
     .catch(error => {
         
         console.log('error connecting to mongoDB: ', error.message)
     })
 
+let uniqueValidator = require('mongoose-unique-validator') 
+
 const contractsSchema = new mongoose.Schema({
-    name: String,
-    number: [String]
+    name: {
+        type:String,
+        required:true,
+        unique:true,
+        minlength:3
+    },
+    number: {
+        type:[String],
+        required:true,
+        validate: {
+            validator:(v)=>{
+                if(v.length < 1)return false
+                if(v.reduce((pre, cur) => {
+                    return (pre > cur.length)?cur.length:pre 
+                }, v[0].length) < 8) return false 
+            },
+            message: ' Array is empty or number less then 8.' 
+        }
+    }
 })
+contractsSchema.plugin(uniqueValidator)
 
 contractsSchema.set('toJSON', {
     transform: (document, returnedObject) => {

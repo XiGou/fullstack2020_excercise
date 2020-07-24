@@ -17,9 +17,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "json-server -p3001 --watch db.json",
-    "build:ui":"rm -rf build && npm run build --prod && cp -r build ../../deploy/phonebookBackend ",
+    "build:ui":"rm -rf build && npm run build --prod && /bin/cp -rf build ../../deploy/phonebookBackend ",
     "deploy": "git push origin master",
-    "deploy:full": "npm run build:ui && cd ../../deploy/phonebookBackend && git add -A && git commit -m 'uibuild' && git push origin master"
+    "deploy:full": "npm run build:ui && cd ../../deploy/phonebookBackend"
   },
   "eslintConfig": {
     "extends": "react-app"

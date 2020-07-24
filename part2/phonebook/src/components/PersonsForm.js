@@ -67,6 +67,10 @@ const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,
             setNewPerson({})
           }
         )
+        .catch(error => {
+          setNotiMessage(JSON.stringify(error.response.data))
+         
+        })
         //post to server
 
         
