@@ -13,14 +13,17 @@ const PersonsForm = ({persons, setPersons, newPerson, setNewPerson, showPersons,
         if(names.includes(newPerson.name)){
           let name = newPerson.name
           // alert(`${name}  is already added to phonebook`)
-          let id
-          id = persons.find((p)=>p.name === newPerson.name).id
+         
+          let id = persons.find((p)=>p.name === newPerson.name).id
 
-          personsServices.updateNumber(id, newPerson)
+          let notUpdatePerson = persons.find((p)=>p.name === newPerson.name)
+          let updatedPerson = {...notUpdatePerson, number:[...notUpdatePerson.number, newPerson.number]}
+
+          personsServices.updateNumber(id, updatedPerson)
           .then(
             ()=>{
-              setPersons(persons.map((p)=>p.name===newPerson.name?{...p, number:newPerson.number}:p))
-              setShowPersons(showPersons.map((p)=>p.name===newPerson.name?{...p, number:newPerson.number}:p))
+              setPersons(persons.map((p)=>p.name===newPerson.name?updatedPerson:p))
+              setShowPersons(showPersons.map((p)=>p.name===newPerson.name?updatedPerson:p))
               
               setNotiMessage(`update ${newPerson.name}'s Number.`)
               setTimeout(() => {

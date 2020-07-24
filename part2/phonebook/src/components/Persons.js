@@ -9,7 +9,13 @@ const Persons = ({showPersons, setPersons, persons, setShowPersons}) => {
                 {
                 showPersons.map((person)=> (
                     <li  key={person.id}>
-                        <b> {person.name}: {person.number} </b>
+                        <b> {person.name}: 
+                        <ul>
+                            {
+                                person.number.map((Num, idx) => (<li key={idx}> {Num} </li>))
+                            } 
+                        </ul>
+                        </b>
                         <button onClick={() => {
                             let result = window.confirm(`dalete ${person.name} ?`)
                             if(!result) return

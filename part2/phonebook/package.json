@@ -18,8 +18,8 @@
     "eject": "react-scripts eject",
     "server": "json-server -p3001 --watch db.json",
     "build:ui":"rm -rf build && npm run build --prod && cp -r build ../../deploy/phonebookBackend ",
-    "deploy": "cd ../../deploy/phonebookBackend && git push origin master",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy"
+    "deploy": "git push origin master",
+    "deploy:full": "npm run build:ui && cd ../../deploy/phonebookBackend && git add -A && git commit -m 'uibuild' && git push origin master"
   },
   "eslintConfig": {
     "extends": "react-app"
