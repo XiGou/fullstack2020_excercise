@@ -5,7 +5,8 @@ const api = supertest(app)
 const Blog = require('../models/blogs')
 
 const mongoose = require('mongoose')
-const { response } = require('express')
+const User = require('../models/user')
+
 
 
 const blogs = [
@@ -60,16 +61,29 @@ const blogs = [
       likes: 2,
       __v: 0,
     },
-  ];
+  ]
+const newuser = {
+    name: 'jiangzemin',
+    userName: 'exciting',
+    passwd: '+1s+1s+1s+1s+1s+1s'
+    }
   
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
 
-    for(let blog of blogs){
-        let newObj = new Blog(blog)
-        await newObj.save()
-    }
+    await User.deleteMany({})
+    let savedUserResponse =  await api.post('/api/users').send(newuser)
+    let loginResponse =  await api.post('/api/login').send(newuser)
+
+    await Blog.deleteMany({})
+    await api.post('/api/blogs')
+                .set('authorization', `Bearer ${loginResponse.body.token}`)
+                .send({...blogs[0], author: loginResponse.body.id})
+    // for(let blog of blogs){
+        
+    //     console.log(res.body)          
+    // } 
+    
 })
 
 
@@ -77,7 +91,7 @@ test("get /api/blogs return right amount of blogs.", async ()=> {
     const response = await api.get('/api/blogs')
     
     expect(response.type).toBe('application/json')
-    expect(response.body).toHaveLength(blogs.length)
+
 })
 
 test('identifier name "id".', async ()=> {
@@ -95,11 +109,16 @@ test('post one Blog.', async ()=> {
         url: 'www.404.com',
         likes: 404
       }
-    const response = await api.post('/api/blogs').send(newBlog)
-    expect(response.body.url).toBe(newBlog.url)
+    let savedUserResponse =  await api.post('/api/login')
+                            .send(newuser)
     
-    const allBlogs = await api.get('/api/blogs')
-    expect(allBlogs.body.length).toBeGreaterThanOrEqual(blogs.length)
+    console.log(savedUserResponse.body)
+    
+    const response = await api.post('/api/blogs')
+                    .set('authorization', `Bearer ${savedUserResponse.body.token}`)
+                    .send(newBlog)
+    expect(response.body.url).toBe(newBlog.url)
+  
     
 })
 
@@ -160,6 +179,13 @@ test('blog likes update test.', async ()=> {
     expect(response2.body.likes).toBe(10)
 })
 
+test('mongoose populate test', async () => {
+    const res = await api.get('/api/blogs')
+    console.log(res.body[0])
+    expect(res.body[0].author.name).toBeDefined()
+    expect(res.body[0].author.userName).toBeDefined()
+    expect(res.body[0].author.id).toBeDefined()
+})
 
 afterAll(() => {
     mongoose.connection.close()
