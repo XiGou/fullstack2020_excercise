@@ -35,7 +35,7 @@ blogsRouter.post('/', async (request, response) => {
 
     const user = await User.findById(decodedToken.id)
 
-    body.author = user._id
+    body.author = user.id
 
     const blog = new Blog(body)
     let savedBlog = await blog.save()
