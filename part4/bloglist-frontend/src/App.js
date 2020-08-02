@@ -9,23 +9,20 @@ import Togglable from './components/Togglable'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
-  const [newBlog, setNewBlog] = useState({}) 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [newBlog, setNewBlog] = useState({})
   const [notification, setNotification] = useState(null)
   const [loginNoti, setLoginNoti] = useState(null)
   const blogFormRef = useRef()
 
-
-  
-
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     const loggedBloglistuser = window.localStorage.getItem('loggedBloglistUser')
     if(loggedBloglistuser){
       const user = JSON.parse(loggedBloglistuser)
@@ -42,7 +39,7 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBloglistUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
 
       setUser(user)
@@ -52,14 +49,14 @@ const App = () => {
       setLoginNoti(`${error.message}, ${JSON.stringify(error.response.data)}`)
       setTimeout(() => {
         setLoginNoti(null)
-      }, 3000);
+      }, 3000)
     }
   }
 
-  const handleLogout = (event) => {
+  const handleLogout = () => {
     window.localStorage.removeItem(
       'loggedBloglistUser'
-    ) 
+    )
     setUser(null)
   }
 
@@ -71,13 +68,13 @@ const App = () => {
         <Notification message={loginNoti}/>
         <form>
           <div>
-            username:<input value={username || ''} 
-                      onChange={event=>setUsername(event.target.value)}/>
+            username:<input value={username || ''}
+              onChange={event => setUsername(event.target.value)}/>
           </div>
           <div>
             password:<input value={password || ''}
-                     onChange={event=>setPassword(event.target.value)}
-                     type='password'/>
+              onChange={event => setPassword(event.target.value)}
+              type='password'/>
           </div>
           <button type='submit' onClick={handleLogin}>login</button>
         </form>
@@ -85,35 +82,35 @@ const App = () => {
     )
   }
 
-  blogs.sort((a, b)=>-(a.likes-b.likes))
+  blogs.sort((a, b) => -(a.likes-b.likes))
 
   return (
     <div>
       <h2>blogs</h2>
-      <div> {user.userName} has logged in. <button onClick={handleLogout}>logout</button> </div> 
-      <Togglable 
-      buttonLabelWhenshow='cancel'
-      buttonLabelWhenhide='new blog'
-      ref={blogFormRef} >
+      <div> {user.userName} has logged in. <button onClick={handleLogout}>logout</button> </div>
+      <Togglable
+        buttonLabelWhenshow='cancel'
+        buttonLabelWhenhide='new blog'
+        ref={blogFormRef} >
 
-        <CreateBlogForm 
-        setNewBlog={setNewBlog}
-        newBlog={newBlog}
-        blogs={blogs}
-        setBlogs={setBlogs}
-        notification={notification}
-        setNotification={setNotification}
-        blogFormRef={blogFormRef}
+        <CreateBlogForm
+          setNewBlog={setNewBlog}
+          newBlog={newBlog}
+          blogs={blogs}
+          setBlogs={setBlogs}
+          notification={notification}
+          setNotification={setNotification}
+          blogFormRef={blogFormRef}
         />
       </Togglable>
 
       {
-      blogs.map(blog =>
-        <Blog key={blog.id} 
-         blog={blog}
-         setBlogs={setBlogs}
-         blogs={blogs} />
-      )}
+        blogs.map(blog =>
+          <Blog key={blog.id}
+            blog={blog}
+            setBlogs={setBlogs}
+            blogs={blogs} />
+        )}
     </div>
   )
 }
