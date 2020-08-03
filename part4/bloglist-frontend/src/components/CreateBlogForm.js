@@ -10,7 +10,8 @@ const CreateBlogForm = ({
   notification,
   blogs,
   newBlog,
-  blogFormRef
+  blogFormRef,
+  mockTestCreateBlog
 }) => {
   const handleTitle = (event) => {
     setNewBlog( { ...newBlog, title: event.target.value } )
@@ -24,7 +25,8 @@ const CreateBlogForm = ({
   const handleCreateBlog = async () => {
     let resData
     try {
-      console.log(newBlog)
+      // console.log(newBlog)
+      mockTestCreateBlog(newBlog)
       resData = await blogService.createBlog(newBlog)
       setNotification(`${resData.title} By ${newBlog.author} Created.`)
       setBlogs(blogs.concat(resData))

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import blogServices from '../services/blogs'
-const Blog = ({ blog, setBlogs, blogs }) => {
+const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -17,6 +17,10 @@ const Blog = ({ blog, setBlogs, blogs }) => {
   }
 
   const handleLikeOneBlog = async (blog) => {
+
+    //non sence, just for exercise
+    likeClicked()
+
     try {
       const newerBlog = await blogServices.likeOneBlog(blog)
       setCurBlog(newerBlog)
@@ -38,16 +42,16 @@ const Blog = ({ blog, setBlogs, blogs }) => {
   blog = curBlog
 
   if(!showBlogDetail){ return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
 
-      <h2>{blog.title} --- {blog.author.name} </h2>
+      <h2 className='blogTitleAndAuthor'>{blog.title} --- {blog.author.name} </h2>
       <button onClick={ toggleShowDetails }>View detail</button>
     </div>
   )}
   else {
     return (
-      <div style={blogStyle}>
-        <h2>{blog.title} </h2>
+      <div style={blogStyle} className='blog'>
+        <h2 className='blogTitleAndAuthor'>{blog.title} </h2>
         <button onClick={ toggleShowDetails }>hide detail</button>
         <div>URL: {blog.url}</div>
         <div>Likes: {blog.likes} <button onClick={() => handleLikeOneBlog(blog)}>like</button></div>
