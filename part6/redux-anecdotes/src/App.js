@@ -11,11 +11,8 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect( () => {
-    async function  fetchData() {
-      const anecs = await anecService.getAll()
-      dispatch(initializeAnecdote(anecs))
-    }
-    fetchData()
+    dispatch(initializeAnecdote())
+    
   }, [dispatch])
 
   return (

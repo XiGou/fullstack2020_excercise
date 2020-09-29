@@ -1,4 +1,5 @@
-
+import anecService from '../services/anecdotes'
+import { useSelector } from 'react-redux'
 
 const anecdotesAtStart = [
   'If it hurts, do it more often',
@@ -21,26 +22,38 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(a => asObject(a))
 
-const voteOneAnecdote = ( anecID ) => {
-  return {
-    type: 'VOTE',
-    data: {
-      id: anecID
-    }
+const voteOneAnecdote = ( anec ) => {
+
+  return async dispatch => {
+
+    const newAnec = await anecService.voteOneAnec(anec)
+    dispatch({
+      type: 'VOTE',
+      data: newAnec
+    })
+
   }
 }
 
-const createAnecdote = ( anec ) => {
-  return {
-    type: 'CREATE_ANECDOTE',
-    data: anec
+const createAnecdote = ( anecText ) => {
+  return async dispatch => {
+    const createdAnec = await anecService.createAnec({
+      content:anecText,
+      votes: 0})
+    dispatch({
+      type: 'CREATE_ANECDOTE',
+      data: createdAnec
+    })
   }
 }
 
 const initializeAnecdote = ( data ) => {
-  return {
-    type: 'INIT_ANECDOTES',
-    data
+  return async dispatch => {
+    const anecdotes = await anecService.getAll()
+    dispatch({
+      type: 'INIT_ANECDOTES',
+      data:anecdotes
+    })
   }
 }
 
@@ -49,19 +62,15 @@ const initializeAnecdote = ( data ) => {
 const anecdoteReducer = (state = initialState, action) => {
   switch ( action.type ){
     case 'VOTE':
-      const id = action.data.id
-      const anecdoteToVote = state.find( anec => anec.id === id)
-      const changedAnec = {
-        ...anecdoteToVote,
-        votes: anecdoteToVote.votes + 1
-      }
+      const newAnec = action.data
+      
       return state.map( anec =>
-        anec.id === id ? changedAnec : anec
+        anec.id === newAnec.id ? newAnec : anec
       )
     case 'CREATE_ANECDOTE':
       const anec = action.data
       return state.concat(anec)
-    case 'INIT_ANECDITES':
+    case 'INIT_ANECDOTES':
       return action.data
     default:
       return state

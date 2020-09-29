@@ -1,14 +1,23 @@
+import { useDispatch } from "react-redux"
+
 const initialNoti = { message: ''}
 
-const setNotification = (msg) => {
-  return (
-    {
+const setNotification = (msg, time) => {
+
+  return async dispatch => {
+    dispatch({
       type: 'SET_NOTIFICATION',
       data: {
-        message: msg
+        message: msg,
+        time
       }
-    }
-  )
+    })
+    setTimeout(() => {
+      dispatch(deleteNotification())
+    }, time*1000)
+
+  }
+  
 }
 const deleteNotification = () => {
   return (
@@ -21,15 +30,11 @@ const deleteNotification = () => {
 const notificationReducer = (state = initialNoti, action) => {
   switch ( action.type ) {
     case 'SET_NOTIFICATION':
-      const noti = action.data.message
-      return { ...state, message: noti}
+      const msg = action.data.message
+      return { ...state, message: msg}
 
     case 'DELETE_NOTI':
       return { ...state, message: '' }
-
-    case 'CREATE_ANECDOTE':
-      const anecText = action.data.anecText
-      return { ...state, message: `you create '${anecText}' `}
 
     default:
       return state
