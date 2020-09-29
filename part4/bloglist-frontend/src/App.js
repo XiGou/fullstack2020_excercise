@@ -11,7 +11,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [newBlog, setNewBlog] = useState({})
+
   const [notification, setNotification] = useState(null)
   const [loginNoti, setLoginNoti] = useState(null)
   const blogFormRef = useRef()
@@ -60,6 +60,23 @@ const App = () => {
     setUser(null)
   }
 
+  const CreateBlog = async (newBlog) => {
+    let resData
+    try {
+      // console.log(newBlog)
+      resData = await blogService.createBlog(newBlog)
+      setNotification(`${resData.title} By ${newBlog.author} Created.`)
+      setBlogs(blogs.concat(resData))
+      blogFormRef.current.toggleVisible()
+
+    } catch (error) {
+      setNotification(`error:${error.message}`)
+    }
+    setTimeout(() => {
+      setNotification(null)
+    }, 3000)
+  }
+
 
   if (user === null) {
     return (
@@ -68,15 +85,15 @@ const App = () => {
         <Notification message={loginNoti}/>
         <form>
           <div>
-            username:<input value={username || ''}
+            username:<input id='usernameInput' value={username || ''}
               onChange={event => setUsername(event.target.value)}/>
           </div>
           <div>
-            password:<input value={password || ''}
+            password:<input id='passwdInput' value={password || ''}
               onChange={event => setPassword(event.target.value)}
               type='password'/>
           </div>
-          <button type='submit' onClick={handleLogin}>login</button>
+          <button id='loginBtn' type='submit' onClick={handleLogin}>login</button>
         </form>
       </div>
     )
@@ -94,13 +111,7 @@ const App = () => {
         ref={blogFormRef} >
 
         <CreateBlogForm
-          setNewBlog={setNewBlog}
-          newBlog={newBlog}
-          blogs={blogs}
-          setBlogs={setBlogs}
-          notification={notification}
-          setNotification={setNotification}
-          blogFormRef={blogFormRef}
+          CreateBlogFunc={CreateBlog}
         />
       </Togglable>
 

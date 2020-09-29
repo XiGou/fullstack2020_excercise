@@ -54,7 +54,7 @@ const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
         <h2 className='blogTitleAndAuthor'>{blog.title} </h2>
         <button onClick={ toggleShowDetails }>hide detail</button>
         <div>URL: {blog.url}</div>
-        <div>Likes: {blog.likes} <button onClick={() => handleLikeOneBlog(blog)}>like</button></div>
+        <div>Likes: {blog.likes}</div><button onClick={() => handleLikeOneBlog(blog)}>like</button>
         <div>Author: {blog.author.name}</div>
         <button onClick={() => handleDeleteOneBlog(blog)}>delete Blog</button>
       </div>

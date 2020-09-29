@@ -12,12 +12,26 @@ test('When click like button twice.', () => {
     url: 'www.sb.com'
   }
   
-  const mockHandler = jest.fn()
+  const mockTestCreateBlog = jest.fn()
   const component = render(
-    <CreateBlogForm  mockTestCreateBlog={ mockHandler } />
+    <CreateBlogForm  createBlog={ mockTestCreateBlog } />
   )
+
+  const uinput = component.container.querySelector('#urlInput')
+  const ainput = component.container.querySelector('#authorInput')
+  const tinput = component.container.querySelector('#titleInput')
+  const btn = component.container.querySelector('button')
   // component.debug()
 
-  
-  
+  fireEvent.change(uinput, {target: {value: "https://url.com"}})
+  fireEvent.change(ainput, {target: {value: "jiangjiang"}})
+  fireEvent.change(tinput, {target: {value: "fake title!"}})
+
+  fireEvent.click(btn)
+
+  expect(mockTestCreateBlog.mock.calls.length).toBe(1)
+  expect(mockTestCreateBlog.mock.calls[0][0]).toEqual(
+    { url: 'https://url.com',
+    author: 'jiangjiang',
+    title: 'fake title!' })
 })

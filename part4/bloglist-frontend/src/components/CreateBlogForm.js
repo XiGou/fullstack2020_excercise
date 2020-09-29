@@ -1,18 +1,11 @@
-import React from 'react'
+import React, {useState} from 'react'
 import blogService from '../services/blogs'
 import Notification from './Notification'
 
 
-const CreateBlogForm = ({
-  setNewBlog,
-  setBlogs,
-  setNotification,
-  notification,
-  blogs,
-  newBlog,
-  blogFormRef,
-  mockTestCreateBlog
-}) => {
+const CreateBlogForm = ({CreateBlogFunc}) => {
+  const [newBlog, setNewBlog] = useState({})
+
   const handleTitle = (event) => {
     setNewBlog( { ...newBlog, title: event.target.value } )
   }
@@ -22,32 +15,19 @@ const CreateBlogForm = ({
   const handleUrl = (event) => {
     setNewBlog( { ...newBlog, url: event.target.value } )
   }
-  const handleCreateBlog = async () => {
-    let resData
-    try {
-      // console.log(newBlog)
-      mockTestCreateBlog(newBlog)
-      resData = await blogService.createBlog(newBlog)
-      setNotification(`${resData.title} By ${newBlog.author} Created.`)
-      setBlogs(blogs.concat(resData))
-      blogFormRef.current.toggleVisible()
-
-    } catch (error) {
-      setNotification(`error:${error.message}`)
-    }
-    setTimeout(() => {
-      setNotification(null)
-    }, 3000)
+  
+  const handleCreateBlog = event => {
+    event.preventDefault()
+    CreateBlogFunc(newBlog)
   }
-
   return (
     <div>
       <h2>Create</h2>
-      <Notification message={notification}/>
-      <div>title: <input onChange={handleTitle}/> </div>
-      <div>author: <input onChange={handleAuthor}/> </div>
-      <div>url: <input onChange={handleUrl}/> </div>
-      <button onClick={handleCreateBlog}>create</button>
+      {/* <Notification message={notification}/> */}
+      <div>title: <input id="titleInput" onChange={handleTitle}/> </div>
+      <div>author: <input id="authorInput" onChange={handleAuthor}/> </div>
+      <div>url: <input id="urlInput" onChange={handleUrl}/> </div>
+      <button id='createBlogBtn' onClick={handleCreateBlog}>create</button>
     </div>
   )
 }
