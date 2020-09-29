@@ -1,20 +1,27 @@
 import { useDispatch } from "react-redux"
 
-const initialNoti = { message: ''}
+const initialNoti = { 
+  message: '',
+  timeoutIDs: []
+}
 
 const setNotification = (msg, time) => {
 
   return async dispatch => {
+    
+    const tmoID = setTimeout(() => {
+      dispatch(deleteNotification())
+    }, time*1000)
+
+    console.log("  ", tmoID)
+    
     dispatch({
       type: 'SET_NOTIFICATION',
       data: {
         message: msg,
-        time
+        tmoutID: tmoID
       }
     })
-    setTimeout(() => {
-      dispatch(deleteNotification())
-    }, time*1000)
 
   }
   
@@ -31,10 +38,18 @@ const notificationReducer = (state = initialNoti, action) => {
   switch ( action.type ) {
     case 'SET_NOTIFICATION':
       const msg = action.data.message
-      return { ...state, message: msg}
+      const tmoutID = action.data.tmoutID
+      // console.log("tmoutID:", state.timeoutIDs)
+      
+      for (const ID of state.timeoutIDs) {
+        // console.log("DEL tmoutID:", ID)
+        clearTimeout(ID)
+      }
+      return { ...state, message: msg, timeoutIDs: [tmoutID] }
 
     case 'DELETE_NOTI':
-      return { ...state, message: '' }
+
+      return { ...state, message: '', timeoutIDs:[] }
 
     default:
       return state
