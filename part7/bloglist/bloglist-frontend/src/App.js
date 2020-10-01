@@ -1,26 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
+import BlogsList from './components/BlogsList'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
 import CreateBlogForm from './components/CreateBlogForm'
 import Togglable from './components/Togglable'
+import {useDispatch} from 'react-redux' 
+import { addBlog, intializeBlogs } from './reducers/blogsReducer'
+import { setNotification, deleteNoti } from './reducers/notificationReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const [notification, setNotification] = useState(null)
+  
   const [loginNoti, setLoginNoti] = useState(null)
   const blogFormRef = useRef()
 
+  const dispatch = useDispatch()
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
-  }, [])
+    dispatch(intializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     const loggedBloglistuser = window.localStorage.getItem('loggedBloglistUser')
@@ -36,7 +39,6 @@ const App = () => {
     let user
     try {
       user = await loginService.login(username, password)
-
       window.localStorage.setItem(
         'loggedBloglistUser', JSON.stringify(user)
       )
@@ -46,10 +48,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (error) {
-      setLoginNoti(`${error.message}, ${JSON.stringify(error.response.data)}`)
-      setTimeout(() => {
-        setLoginNoti(null)
-      }, 3000)
+      dispatch(setNotification(`${error.message}, ${JSON.stringify(error.response.data)}`, 3))
     }
   }
 
@@ -65,16 +64,13 @@ const App = () => {
     try {
       // console.log(newBlog)
       resData = await blogService.createBlog(newBlog)
-      setNotification(`${resData.title} By ${newBlog.author} Created.`)
-      setBlogs(blogs.concat(resData))
+      dispatch(setNotification(`${newBlog.title} By ${newBlog.author} Created.`, 3))
+      dispatch(addBlog(resData))
       blogFormRef.current.toggleVisible()
 
     } catch (error) {
-      setNotification(`error:${error.message}`)
+      dispatch(setNotification(`error:${error.message}`, 3))
     }
-    setTimeout(() => {
-      setNotification(null)
-    }, 3000)
   }
 
 
@@ -82,7 +78,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        <Notification message={loginNoti}/>
+        <Notification />
         <form>
           <div>
             username:<input id='usernameInput' value={username || ''}
@@ -99,7 +95,7 @@ const App = () => {
     )
   }
 
-  blogs.sort((a, b) => -(a.likes-b.likes))
+
 
   return (
     <div>
@@ -115,13 +111,7 @@ const App = () => {
         />
       </Togglable>
 
-      {
-        blogs.map(blog =>
-          <Blog key={blog.id}
-            blog={blog}
-            setBlogs={setBlogs}
-            blogs={blogs} />
-        )}
+      <BlogsList />
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import {useDispatch} from 'react-redux'
+import { delBlog, updateBlog } from '../reducers/blogsReducer'
 import blogServices from '../services/blogs'
-const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
+const Blog = ({ blog, likeClicked }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -8,9 +10,9 @@ const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
     borderWidth: 1,
     marginBottom: 5
   }
+  const dispatch = useDispatch()
 
   const [showBlogDetail, setShowBlogDetail] = useState(false)
-  const [curBlog, setCurBlog] = useState(blog)
 
   const toggleShowDetails = () => {
     setShowBlogDetail(!showBlogDetail)
@@ -18,12 +20,9 @@ const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
 
   const handleLikeOneBlog = async (blog) => {
 
-    //non sence, just for exercise
-    likeClicked()
-
     try {
       const newerBlog = await blogServices.likeOneBlog(blog)
-      setCurBlog(newerBlog)
+      dispatch(updateBlog(newerBlog))
     } catch (error) {
       console.log(error.messages)
     }
@@ -33,13 +32,12 @@ const Blog = ({ blog, setBlogs, blogs, likeClicked }) => {
     if(!confirmRst) return
     try {
       await blogServices.deleteOneBlog(blog)
-      setBlogs(blogs.filter(blg => blg.id !== blog.id))
+      dispatch(delBlog(blog.id))
+      //setBlogs(blogs.filter(blg => blg.id !== blog.id))
     } catch (error) {
       console.log(error.messages)
     }
   }
-
-  blog = curBlog
 
   if(!showBlogDetail){ return (
     <div style={blogStyle} className='blog'>

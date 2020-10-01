@@ -1,9 +1,11 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 
-
-const Notification = ({ message }) => {
-  if(null === message)return null
+const Notification = () => {
+  const notiText = useSelector( state => state.notification.text )
+  console.log(notiText)
+  if('' === notiText)return null
 
   const inlineStyle = {
     color: 'green',
@@ -16,7 +18,7 @@ const Notification = ({ message }) => {
   }
   return (
     <div className='Notification' style={inlineStyle}>
-      {message}
+      {notiText}
     </div>
   )
 }
