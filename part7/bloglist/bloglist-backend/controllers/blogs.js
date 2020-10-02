@@ -59,7 +59,8 @@ blogsRouter.delete('/:id', async (request, response) => {
         return response.status(403).json({error: 'no Permition to delete.'})
     }
     
-    let deleteRes = await Blog.deleteOne({_id: id})
+    let toDel = await Blog.findOne({_id: id})
+    let deleteRes = toDel.remove()
     
     response.status(204).json(deleteRes)
 })
@@ -68,10 +69,17 @@ blogsRouter.delete('/:id', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
     const id = request.params.id
     
-    let updatedres = await Blog.updateOne({_id: id}, {likes: request.body.likes})
-    let updatedNote = await Blog.findById(id)
+    let updatedres = await Blog.updateOne({_id: id}, 
+        {likes: request.body.likes, comments: request.body.comments})
+    let updatedNote = await Blog.findById(id).populate('author')
     response.json(updatedNote)
 })
+blogsRouter.get('/:id', async (request, response) => {
+    const id = request.params.id
+    let blog = await Blog.findById(id).populate('author')
+    response.json(blog)
+})
+
 
 
 

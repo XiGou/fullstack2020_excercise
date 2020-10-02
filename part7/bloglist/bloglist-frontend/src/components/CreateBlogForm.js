@@ -1,10 +1,14 @@
 import React, {useState} from 'react'
+import { useDispatch } from 'react-redux'
+import { addBlog } from '../reducers/blogsReducer'
+import { setNotification } from '../reducers/notificationReducer'
 import blogService from '../services/blogs'
 import Notification from './Notification'
 
 
-const CreateBlogForm = ({CreateBlogFunc}) => {
-  const [newBlog, setNewBlog] = useState({})
+const CreateBlogForm = ({blogFormRef}) => {
+  const [newBlog, setNewBlog] = useState({comments:[]})
+  const dispatch = useDispatch()
 
   const handleTitle = (event) => {
     setNewBlog( { ...newBlog, title: event.target.value } )
@@ -16,10 +20,23 @@ const CreateBlogForm = ({CreateBlogFunc}) => {
     setNewBlog( { ...newBlog, url: event.target.value } )
   }
   
-  const handleCreateBlog = event => {
+  const handleCreateBlog = async event => {
     event.preventDefault()
-    CreateBlogFunc(newBlog)
+    let resData
+    try {
+      // console.log(newBlog)
+      resData = await blogService.createBlog({...newBlog, comments:[]})
+      
+      dispatch(setNotification(`${newBlog.title} By ${newBlog.author} Created.`, 3))
+      dispatch(addBlog(resData))
+      blogFormRef.current.toggleVisible()
+
+    } catch (error) {
+      dispatch(setNotification(`error:${error.message}`, 3))
+    }
   }
+
+
   return (
     <div>
       <h2>Create</h2>

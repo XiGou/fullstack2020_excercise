@@ -5,18 +5,29 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import CreateBlogForm from './components/CreateBlogForm'
 import Togglable from './components/Togglable'
-import {useDispatch} from 'react-redux' 
+import LoginForm from './components/LoginForm'
+import UserInfo from './views/UserInfo'
+import Blog from './views/Blog'
+import {useDispatch, useSelector} from 'react-redux' 
 import { addBlog, intializeBlogs } from './reducers/blogsReducer'
 import { setNotification, deleteNoti } from './reducers/notificationReducer'
+import { setLoggedin, setNotlogin } from './reducers/loginReducer'
+import {
+  BrowserRouter as Router,
+  Switch, Route, Link, Redirect,
+  useRouteMatch
+} from 'react-router-dom'
+import Users from './views/Users'
+import { intializeUsers } from './reducers/usersReducer'
+import { Button, Nav } from 'react-bootstrap'
+
 
 const App = () => {
 
-  const [user, setUser] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const loginInfo = useSelector( state => state.login)
+  const users = useSelector(state => state.users)
+  const allBlogs = useSelector(state => state.blogs)
 
-  
-  const [loginNoti, setLoginNoti] = useState(null)
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
@@ -29,89 +40,111 @@ const App = () => {
     const loggedBloglistuser = window.localStorage.getItem('loggedBloglistUser')
     if(loggedBloglistuser){
       const user = JSON.parse(loggedBloglistuser)
-      setUser(user)
       blogService.setToken(user.token)
+      dispatch(setLoggedin())
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    let user
-    try {
-      user = await loginService.login(username, password)
-      window.localStorage.setItem(
-        'loggedBloglistUser', JSON.stringify(user)
-      )
-      blogService.setToken(user.token)
+  useEffect(() => {
+    dispatch(intializeUsers())
+  }, [dispatch])
 
-      setUser(user)
-      setUsername('')
-      setPassword('')
-    } catch (error) {
-      dispatch(setNotification(`${error.message}, ${JSON.stringify(error.response.data)}`, 3))
-    }
-  }
+  const matchUserID = useRouteMatch('/users/:id')
+  const user = matchUserID
+    ? users.find(u => {
+      // console.log(String(u.id) === String(matchUserID.params.id), " ", u.id, " ", matchUserID.params.id)
+      return String(u.id) === String(matchUserID.params.id)
+    })
+    : null
+  const matchBlogID = useRouteMatch('/blogs/:id')
+  const blog = matchBlogID
+    ? allBlogs.find(b => {
+      // console.log(String(u.id) === String(matchBlogID.params.id), " ", u.id, " ", matchUserID.params.id)
+      return String(b.id) === String(matchBlogID.params.id)
+    })
+    : null
+
+
 
   const handleLogout = () => {
     window.localStorage.removeItem(
       'loggedBloglistUser'
     )
-    setUser(null)
-  }
-
-  const CreateBlog = async (newBlog) => {
-    let resData
-    try {
-      // console.log(newBlog)
-      resData = await blogService.createBlog(newBlog)
-      dispatch(setNotification(`${newBlog.title} By ${newBlog.author} Created.`, 3))
-      dispatch(addBlog(resData))
-      blogFormRef.current.toggleVisible()
-
-    } catch (error) {
-      dispatch(setNotification(`error:${error.message}`, 3))
-    }
+    dispatch(setNotlogin())
   }
 
 
-  if (user === null) {
+
+
+  if (loginInfo.status === 'notlogin') {
     return (
       <div>
         <h2>Log in to application</h2>
         <Notification />
-        <form>
-          <div>
-            username:<input id='usernameInput' value={username || ''}
-              onChange={event => setUsername(event.target.value)}/>
-          </div>
-          <div>
-            password:<input id='passwdInput' value={password || ''}
-              onChange={event => setPassword(event.target.value)}
-              type='password'/>
-          </div>
-          <button id='loginBtn' type='submit' onClick={handleLogin}>login</button>
-        </form>
+        <LoginForm />
       </div>
+    )
+  }
+  const Menu = () => {
+    return (
+      <Nav>
+        <Nav.Item>
+          <Nav.Link eventKey='/' href='#'>
+            <Link to='/blogs'>Blogs</Link>
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='users' href='#' as='span'>
+            <Link to='/users'>Users</Link>
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="disabled" disabled>
+            <span>
+              {loginInfo.username} has logged in. <Button onClick={handleLogout}>logout</Button> 
+            </span>
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
     )
   }
 
 
 
+  
   return (
-    <div>
+    <div className='container'>
+      <Menu />
       <h2>blogs</h2>
-      <div> {user.userName} has logged in. <button onClick={handleLogout}>logout</button> </div>
-      <Togglable
-        buttonLabelWhenshow='cancel'
-        buttonLabelWhenhide='new blog'
-        ref={blogFormRef} >
+      
+      
+      <Switch>
+        <Route path='/users/:id'>
+          <UserInfo user={user} />
+        </Route>
+        <Route path='/blogs/:id'>
+          <Blog blog={blog} />
+        </Route>
+        <Route path='/users'>
+          <Users />
+        </Route>
+        <Route>
+          <Togglable
+          buttonLabelWhenshow='cancel'
+          buttonLabelWhenhide='new blog'
+          ref={blogFormRef}
+          >
+            <CreateBlogForm  blogFormRef={blogFormRef}/>
+          </Togglable>
+          <BlogsList />
+        </Route>
+      </Switch>
+      
+      
+      
 
-        <CreateBlogForm
-          CreateBlogFunc={CreateBlog}
-        />
-      </Togglable>
-
-      <BlogsList />
+      
     </div>
   )
 }

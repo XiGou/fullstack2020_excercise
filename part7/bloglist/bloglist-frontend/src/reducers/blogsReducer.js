@@ -45,9 +45,9 @@ const blogsReducer = (blogs = initialBlogs, action) => {
     case 'ADD_BLOG':
       return [...blogs, action.data]
     case 'DEL_BLOG':
-      return blogs.filter(blog => action.data == blog.id)
+      return blogs.filter(blog => String(action.data) === String(blog.id))
     case 'UPDATE_BLOG':
-      return blogs.map(blog => blog.id === action.data.id? action.data:blog)
+      return blogs.map(blog => String(blog.id) === String(action.data.id)? action.data:blog)
     default:
       return blogs;
   }
