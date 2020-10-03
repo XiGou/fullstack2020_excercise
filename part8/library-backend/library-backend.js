@@ -121,7 +121,7 @@ const typeDefs = gql`
       bookCount: Int!
     ):Author
     
-    editAuthor(
+    editAuthorChgBirthYear(
       name: String!
       setBornTo: Int!
     ): Author
@@ -148,12 +148,14 @@ const resolvers = {
     addBook: (root, args) => {
       const book = {...args, id:uuid()}
       books = books.concat(book)
-      if(!authors.includes(book.author)){
+     
+      if(authors.findIndex( au => au.name === book.author) === -1){
         authors = authors.concat(
           {name: args.author,
-          bookCount: 1})
+          bookCount: 1,
+          id: uuid()})
       } else {
-        authors = authors.map( au => au.name === args.author?au:{...au, bookCount:au.bookCount+1})
+        authors = authors.map( au => au.name !== args.author?au:{...au, bookCount:au.bookCount+1})
       }
       return book
     },
@@ -162,7 +164,7 @@ const resolvers = {
       authors = authors.concat(author)
       return author
     },
-    editAuthor: (root, args) => {
+    editAuthorChgBirthYear: (root, args) => {
       const idx = authors.findIndex( au => au.name === args.name)
       if(idx === -1) return null
       authors[idx] = {...authors[idx], born: args.setBornTo}
