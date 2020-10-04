@@ -27,7 +27,7 @@ const NewBook = (props) => {
       alert('input invalid!')
       return 
     }
-    addBook({
+    await addBook({
     variables: {title, author, published, genres} })
 
 

@@ -115,7 +115,7 @@ const typeDefs = gql`
   
   type Author{
     name: String!
-    id: String!
+    id: ID!
     born: Int
     bookCount: Int!
   }
@@ -135,6 +135,7 @@ const typeDefs = gql`
     authorCount: Int!
     allBooks(author:String, genre:String): [Book]!
     allAuthors: [Author]!
+    queryMyFavoriteGenre: String!
   }
 
   type Mutation {
@@ -173,18 +174,30 @@ const resolvers = {
     bookCount: () => bookModel.collection.countDocuments(),
     authorCount: () => authorModel.collection.countDocuments(),
     allBooks: async (root, args) => {
-      let result = await bookModel.find({})
+      let result = await bookModel.find({}).populate('author')
+      result = result.filter( B => B.author && B.author.name !== 'undefined')
+
       if(typeof(args.author) !== 'undefined')  result = result.
         filter( bk => bk.author === args.author)
       if(typeof(args.genre) !== 'undefined')  result = result.
         filter( bk => bk.genres.includes(args.genre))
-
+      console.log(result)
       return result
     },
     allAuthors: async () => {
       rst = await  authorModel.find({})
       return rst
     },
+    queryMyFavoriteGenre: async (parent, args, context) => {
+      const currentUser = context.currentUser
+      
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+
+      const user = await User.findById(currentUser.id)
+      return user.favoriteGenre
+    }
   },
   Mutation: {
     addBook: async (parent, args, context) => {
@@ -194,7 +207,7 @@ const resolvers = {
         throw new AuthenticationError("not authenticated")
       }
 
-      const book = new bookModel({...args})
+      
       const existAuthor = await authorModel.findOne( {name: args.author, } )
       if(!existAuthor){
         const author = new authorModel({name: args.author})
@@ -203,6 +216,7 @@ const resolvers = {
       }
       const author =await authorModel.findOne({name: args.author})
       // console.log(author)
+      const book = new bookModel({...args})
       book.author = author._id
       try {
         await book.save()
@@ -211,7 +225,9 @@ const resolvers = {
           invalidArgs: args,
         })
       }
-      return book
+      
+      
+      return {...args, author: author}
     },
     addAuthor: async (parent, args) => {
       const author = new authorModel({...args})
@@ -273,7 +289,7 @@ const server = new ApolloServer({
   resolvers,
   context: async ({req}) => {
     const auth = req ? req.headers.authorization : null
-
+    // console.log(auth);
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(
         auth.substring(7), 'FAKE_SECRET'
