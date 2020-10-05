@@ -17,7 +17,7 @@ const  calculateExercise = (dailyExerciseHours: Array<number>,
       );
       const success = (trainingDays == periodLength);
       const rating = Math.floor((trainingDays/periodLength)*3+1);
-      const totalHours = dailyExerciseHours.reduce((a:number, b:number) => a+b);
+      const totalHours = dailyExerciseHours.reduce((a:number, b:number) => a+b, 0);
       const average = totalHours/periodLength;
       const target = targetHoursDaily;
       let ratingDescription;
@@ -44,9 +44,9 @@ const  calculateExercise = (dailyExerciseHours: Array<number>,
         ratingDescription,
         target,
         average,
-      }
+      };
 
-}
+};
 
 const targetHoursDaily: number = Number(process.argv[2]);
 
@@ -58,3 +58,5 @@ for (let index = 3; index < process.argv.length; index++) {
 console.log(
   calculateExercise(dailyExerciseHours, targetHoursDaily)
 );
+
+export default calculateExercise;
