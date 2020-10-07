@@ -1,4 +1,5 @@
 import { Gender, Patient } from "../types";
+// import {v3 as uuid} from "uuid";
 
 const isString = (text:any):text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -40,6 +41,7 @@ export const toNewPatient = (object: any): Omit<Patient, "id"> => {
     occupation: parseString(object.occupation),
     dateOfBirth: parseDate(object.dateOfBirth),
     gender: parseGender(object.gender),
+    entries:[]
   };
 };
 

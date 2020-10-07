@@ -4,10 +4,10 @@ import { Patient, PublicPatient } from "../types";
 import {v4 as uuid} from "uuid";
 import {toNewPatient } from "../utils/parsers";
 
-const patientsRouter = express.Router();
+const diagnosisRouter = express.Router();
 
 
-patientsRouter.get("/", (_req, res) =>{
+diagnosisRouter.get("/", (_req, res) =>{
   const resData = patientsData.map(
     ({name, id, dateOfBirth, gender,occupation }): PublicPatient => {
       return {
@@ -18,16 +18,7 @@ patientsRouter.get("/", (_req, res) =>{
   res.json(resData);
 });
 
-patientsRouter.post("/", (req, res) => {
-  try {
-    const body = toNewPatient(req.body) as Patient;
-    body.id = uuid();
-    res.json(body);
-    
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
+
 
 patientsRouter.get("/:id", (req, res) => {
   const id = req.params.id;
@@ -40,4 +31,4 @@ patientsRouter.get("/:id", (req, res) => {
 
 
 
-export default patientsRouter;
+export default diagnosisRouter;
