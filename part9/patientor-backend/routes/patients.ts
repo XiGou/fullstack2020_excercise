@@ -1,8 +1,8 @@
 import express from "express";
 import patientsData from "../data/patients";
-import { Patient, PublicPatient } from "../types";
+import { Patient, PublicPatient, Entry } from "../types";
 import {v4 as uuid} from "uuid";
-import {toNewPatient } from "../utils/parsers";
+import {toNewPatient, toNewEntry } from "../utils/parsers";
 
 const patientsRouter = express.Router();
 
@@ -21,7 +21,29 @@ patientsRouter.get("/", (_req, res) =>{
 patientsRouter.post("/", (req, res) => {
   try {
     const body = toNewPatient(req.body) as Patient;
+    // store
     body.id = uuid();
+    [...patientsData, body];
+
+    res.json(body);
+    
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+patientsRouter.post("/:id/entries", (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    const body = toNewEntry(req.body) as Entry;
+    //store
+    body.id = uuid();
+    patientsData.map(
+      P => P.id === patientId
+        ?{...P, entries: [...P.entries, body]}
+        :P
+    );
+
     res.json(body);
     
   } catch (error) {
