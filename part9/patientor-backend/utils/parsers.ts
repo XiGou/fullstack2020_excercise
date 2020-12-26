@@ -77,7 +77,7 @@ export const toNewEntry = (obj: any) :Omit<Entry, "id"> => {
   if(obj.diagnosisCodes)parseStringArray(obj.diagnosisCodes);
   switch (type) {
     case "HealthCheck":
-      parseHealthCheckRating(obj.HealthCheckRating);
+      parseHealthCheckRating(obj.healthCheckRating);
       break;
     case "OccupationalHealthcare":
       parseString(obj.employerName);

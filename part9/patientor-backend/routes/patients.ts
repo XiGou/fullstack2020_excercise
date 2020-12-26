@@ -53,6 +53,7 @@ patientsRouter.post("/:id/entries", (req, res) => {
 
 patientsRouter.get("/:id", (req, res) => {
   const id = req.params.id;
+  console.log(id)
   res.json(
     patientsData.filter(P => P.id === id)
     // .map( P => ({...P, entries:[]}))
