@@ -4,3 +4,4 @@ I was busy with my schoolwork and finding job in last 2 months, so after two mon
 
 certificate:
 https://studies.cs.helsinki.fi/stats/api/certificate/fullstackopen/en/45580e8e9d7eb8af3cb74c2c02e5a4df
+![Certifacate](./certificate-fullstack.png)
