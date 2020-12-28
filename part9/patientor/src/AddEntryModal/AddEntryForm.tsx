@@ -1,7 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 import {useStateValue} from "../state";
 import { Grid, Button } from "semantic-ui-react";
-import { Field, Formik, Form } from "formik";
+import { Field, Formik, Form, ErrorMessage, useFormikContext } from "formik";
 import { Entry,Diagnosis, EntryType } from "../types";
 import { TextField, SelectField, NumberField, DiagnosisSelection, Option } from "./FormField";
 
@@ -33,8 +33,14 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
     }}
     onSubmit={onSubmit}
     validate={values => {
-      /// ...
+      const requiredError = "field is required.";
+      const errors: { [field: string]: string } = {};
+      if(!values.specialist){
+        errors.specialist = requiredError;
+      }
+      return errors;
     }}
+    
   >
     {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
 
@@ -57,36 +63,34 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
             name="specialist"
             component={TextField}
           />  
-          <Field
-            label="healthCheckRating"
-            name="healthCheckRating"
-            component={NumberField}
-            min={0}
-            max={3}
-          />
+          <ErrorMessage 
+            name="specialist"/>
+
+
+          
           <SelectField 
             label="type"
             name="type"
             options={EntryTypeOptions}
+            
           />
-
-            <Grid>
-              <Grid.Column floated="left" width={5}>
-                <Button type="button" onClick={onCancel} color="red">
-                  Cancel
-                </Button>
-              </Grid.Column>
-              <Grid.Column floated="right" width={5}>
-                <Button
-                  type="submit"
-                  floated="right"
-                  color="green"
-                  disabled={!dirty || !isValid}
-                >
-                  Add
-                </Button>
-              </Grid.Column>
-            </Grid>
+          <Grid>
+            <Grid.Column floated="left" width={5}>
+              <Button type="button" onClick={onCancel} color="red">
+                Cancel
+              </Button>
+            </Grid.Column>
+            <Grid.Column floated="right" width={5}>
+              <Button
+                type="submit"
+                floated="right"
+                color="green"
+                disabled={!dirty || !isValid}
+              >
+                Add
+              </Button>
+            </Grid.Column>
+          </Grid>
         </Form>
       );
     }}

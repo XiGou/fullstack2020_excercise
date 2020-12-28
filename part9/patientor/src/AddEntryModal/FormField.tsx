@@ -1,5 +1,5 @@
-import React from "react";
-import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
+import React, { useState } from "react";
+import { ErrorMessage, Field, FieldProps, FormikProps, useFormikContext } from "formik";
 import { Dropdown, DropdownProps, Form } from "semantic-ui-react";
 import { Diagnosis, Gender, EntryType, Entry } from "../types";
 import { generatePath } from "react-router-dom";
@@ -24,18 +24,112 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   name,
   label,
   options
-}: SelectFieldProps) => (
-  <Form.Field>
-    <label>{label}</label>
-    <Field as="select" name={name} className="ui dropdown">
-      {options.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label || option.value}
-        </option>
-      ))}
-    </Field>
-  </Form.Field>
-);
+}: SelectFieldProps) => {
+
+  const [entryType, setEntryType] = useState("HealthCheck");
+
+  const {
+    values,
+    handleChange,
+    setFieldValue,
+    handleSubmit,
+    isSubmitting,
+    isValid // will work with validation schema or validate fn defined
+  } = useFormikContext();
+
+  const myHandleChange = (e:React.ChangeEvent<HTMLInputElement>)  => {
+    const selectedEntryType = e.target.value;
+    setEntryType(selectedEntryType)
+    console.log("myHandle selected", selectedEntryType,values);
+    handleChange(e)
+  };
+  if (entryType == "HealthCheck" ) {
+    return (
+      <Form.Field>
+        <label>{label}</label>
+        <Field as="select"  name={name} className="ui dropdown" onChange={myHandleChange}>
+          {options.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label || option.value}
+            </option>
+          ))}
+        </Field>
+        
+        <Field
+          label="healthCheckRating"
+          name="healthCheckRating"
+          component={NumberField}
+          min={0}
+          max={3}
+        />
+    
+      </Form.Field>
+    )
+  }
+
+  if(entryType == "Hospital") {
+    return (
+      <Form.Field>
+        <label>{label}</label>
+        <Field as="select"  name={name} className="ui dropdown" onChange={myHandleChange}>
+          {options.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label || option.value}
+            </option>
+          ))}
+        </Field>
+        
+        <Field
+            label="discharge date"
+            placeholder="XXXX-XX-XX"
+            name="dischargeDate"
+            component={TextField}
+          />  
+        <Field
+            label="discharge criteria"
+            placeholder="XXXX-XX-XX"
+            name="dischargeCriteria"
+            component={TextField}
+          />  
+    
+      </Form.Field>
+    )
+  }
+  // type is OccupationalHealthcare 
+  return (
+    <Form.Field>
+      <label>{label}</label>
+      <Field as="select"  name={name} className="ui dropdown" onChange={myHandleChange}>
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label || option.value}
+          </option>
+        ))}
+      </Field>
+      
+      <Field
+            label="employerName"
+            placeholder="jiangson"
+            name="employerName"
+            component={TextField}
+          />  
+        <Field
+            label="sickLeave startDate"
+            placeholder="XXXX-XX-XX"
+            name="sickLeaveStartDate"
+            component={TextField}
+          />  
+        <Field
+            label="sickLeave endDate"
+            placeholder="XXXX-XX-XX"
+            name="sickLeaveEndDate"
+            component={TextField}
+          />  
+  
+    </Form.Field>
+  )
+
+ };
 
 interface TextProps extends FieldProps {
   label: string;
